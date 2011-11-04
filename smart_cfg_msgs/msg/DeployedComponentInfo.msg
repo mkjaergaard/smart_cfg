@@ -1,0 +1,3 @@
+DeployedComponentID id
+ComponentModelID model_id
+ParameterIDAndValueEx[] parameters

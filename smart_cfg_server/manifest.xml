@@ -1,0 +1,22 @@
+<package>
+  <description brief="smart_cfg_server">
+
+     smart_cfg_server
+
+  </description>
+  <author>Morten Kjærgaard</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/smart_cfg_server</url>
+  <depend package="rospy"/>
+  <depend package="roscpp"/>
+  <depend package="yaml_cpp"/>
+  <depend package="smart_cfg_msgs"/>
+
+<export>
+  <cpp cflags="-I${prefix}/include" lflags="-Wl,-rpath,${prefix}/lib  -L${prefix}/lib -lsmart_cfg_server_l"/>
+</export>
+
+</package>
+
+

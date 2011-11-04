@@ -1,0 +1,4 @@
+ParameterID id
+ParameterValue current_value
+bool change_request
+ParameterValue new_value

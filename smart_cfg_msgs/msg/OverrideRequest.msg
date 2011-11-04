@@ -1,0 +1,2 @@
+DeployedComponentID component_id
+ParameterIDAndValue[] parameters

@@ -1,0 +1,2 @@
+bool subscribe
+ComponentModelID component_id
