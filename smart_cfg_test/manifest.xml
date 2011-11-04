@@ -1,0 +1,16 @@
+<package>
+  <description brief="smart_cfg_test">
+
+     smart_cfg_test
+
+  </description>
+  <author>Morten Kjærgaard</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/smart_cfg_test</url>
+  <depend package="smart_cfg"/>
+  <depend package="smart_cfg_server"/>
+
+</package>
+
+
