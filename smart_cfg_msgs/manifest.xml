@@ -1,0 +1,14 @@
+<package>
+  <description brief="smart_cfg_msgs">
+
+     smart_cfg_msgs
+
+  </description>
+  <author>Morten Kjærgaard</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/smart_cfg_msgs</url>
+
+</package>
+
+
