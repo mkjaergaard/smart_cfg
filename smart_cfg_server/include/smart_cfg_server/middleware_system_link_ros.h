@@ -14,8 +14,22 @@ class MiddlewareSystemLinkRos : public smart_cfg_server::MiddleWareSystemLink
   ros::Timer poll_timer_;
   ros::Subscriber sub_register_deployed_component_;
 
+  void distributeResponse( const DeployedComponentID component_id, const smart_cfg_msgs::ParameterRequest::Response& srv_response )
+  {
+    // Callback on all replied parameters
+    // todo: what to do in case of errors?
+    for( unsigned int i = 0; i < srv_response.get_parameters.size(); i++ )
+    {
+      const smart_cfg_msgs::ParameterDescriptor& srv_param = srv_response.get_parameters.at(i);
+      ParameterIDAndValue param(srv_param.name);
+      std::cout << srv_param.name << " ; " << srv_param.value << std::endl;
+      param.value().setFromEncodedValue(srv_param.value, srv_param.type);
+      smart_cfg_server::MiddleWareSystemLink::triggerPushReplyReceivedNotify( component_id, param );
+    }
+  }
+
   // we do the work in a timer event, and empties the queue
-  void polled_work(const ros::TimerEvent& event)
+  void polledWork(const ros::TimerEvent& event)
   {
     ParameterChangeRequest::ConstPtr request_out;
     if( popChangeRequest(request_out) )
@@ -40,17 +54,7 @@ class MiddlewareSystemLinkRos : public smart_cfg_server::MiddleWareSystemLink
       smart_cfg_msgs::ParameterRequest::Response srv_response;
       ros::service::call( std::string("/")+request_out->id().getText()+std::string("/list_parameters"), srv_request, srv_response );
 
-      // Callback on all replied parameters
-      // todo: what to do in case of errors?
-
-      for( unsigned int i = 0; i < srv_response.get_parameters.size(); i++ )
-      {
-        smart_cfg_msgs::ParameterDescriptor& srv_param = srv_response.get_parameters.at(i);
-        ParameterIDAndValue param(srv_param.name);
-        std::cout << srv_param.name << " ; " << srv_param.value << std::endl;
-        param.value().setFromEncodedValue(srv_param.value, srv_param.type);
-        smart_cfg_server::MiddleWareSystemLink::triggerPushReplyReceivedNotify( request_out->id(), param );
-      }
+      distributeResponse( request_out->id(), srv_response);
     }
   }
 
@@ -60,13 +64,16 @@ class MiddlewareSystemLinkRos : public smart_cfg_server::MiddleWareSystemLink
   void registerDeployedComponentHandler( const smart_cfg_msgs::DeployedComponentID::ConstPtr& id )
   {
     std::cout << "--- Registered Component " << id->name << std::endl;
-    ParameterChangeRequest::ConstPtr request_out;
+    //mngr_->registerDeployedComponent( DeployedComponentID(id->name) );
+    smart_cfg_msgs::ParameterRequest::Request srv_request;
+    smart_cfg_msgs::ParameterRequest::Response srv_response;
     ros::service::call( std::string("/")+id->name+std::string("/list_parameters"), srv_request, srv_response );
+    distributeResponse( DeployedComponentID(id->name), srv_response );
   }
 
  public:
  MiddlewareSystemLinkRos(ros::NodeHandle& nh) : nh_(nh),
-    poll_timer_( nh.createTimer(ros::Duration(0.5), &MiddlewareSystemLinkRos::polled_work, this) ),
+    poll_timer_( nh.createTimer(ros::Duration(0.5), &MiddlewareSystemLinkRos::polledWork, this) ),
     sub_register_deployed_component_( nh_.subscribe<smart_cfg_msgs::DeployedComponentID>("/register_deployed_component", 5, &MiddlewareSystemLinkRos::registerDeployedComponentHandler, this) )
   {
 
