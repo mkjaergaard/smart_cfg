@@ -1,9 +1,9 @@
 #ifndef __PARAMETER_H_INCLUDED__
 #define __PARAMETER_H_INCLUDED__
 
+#include <yaml-cpp/yaml.h>
 #include <smart_cfg/abstract_parameter.h>
-#include <smart_cfg_server/parameter_value_impl.h>
-#include <boost/weak_ptr.hpp>
+#include <smart_cfg/parameter_types.h>
 
 class ParameterizedComponent;
 
@@ -15,63 +15,58 @@ class Parameter : public AbstractParameter
 {
 
 protected:
-  ParameterID id_;
-  ParameterValueImpl<T> value_;
-  bool changed_;
-  boost::weak_ptr<ParameterizedComponent> somep;
+  T value_;
 
 public:
-  Parameter( ParameterizedComponent * owner, const std::string name ) :
-    AbstractParameter( owner ),
-    id_( name ),
-    changed_( false )
+  Parameter( ParameterizedComponent * owner, const std::string& name ) :
+    AbstractParameter( owner, name )
   {
   }
 
+  virtual ~Parameter() {}
+
+  // Getter
   const T& value() const
-  {
-    return value_->value();
-  }
-
-  bool hasChanged()
-  {
-    return changed_;
-  }
-
-  void changeValue( const ParameterValue& new_value )
-  {
-    if( new_value.isKnown() )
-    {
-      boost::shared_ptr<const ParameterValueImpl<T> > t_impl = new_value.getImpl<T>();
-      // Verify that the types are matching
-      if( t_impl.get() != 0 )
-      {
-        value_ = *t_impl;
-        changed_ = true;
-      }
-    }
-  }
-
-  void changeHandled()
-  {
-    changed_ = false;
-  }
-
-  bool isValid()
-  {
-    return value_.isKnown();
-  }
-
-  const ParameterID& getId()
-  {
-    return id_;
-  }
-/*
-  const ParameterValueAbstract& getValue()
   {
     return value_;
   }
-*/
+
+  const std::string& type() const
+  {
+    return ParameterTypes::typeOf<T>();
+  }
+
+  // Encoding
+  bool setEncodedValue( const std::string& value_type, const std::string& encoded_value )
+  {
+    // check right type
+    assert( value_type == ParameterTypes::typeOf<T>() );
+
+    // todo: do some try/catch
+    std::stringstream encoded_stream(encoded_value);
+    YAML::Parser parser(encoded_stream);
+
+    YAML::Node node;
+    if (parser.GetNextDocument(node))
+    {
+      node >> value_;
+      return true;
+    }
+    else
+    {
+      // return false;
+      assert(false);
+    }
+  }
+
+  bool getEncodedValue( std::string& encoded_value_out ) const
+  {
+    YAML::Emitter yaml_encoded;
+    yaml_encoded << value_;
+    encoded_value_out = yaml_encoded.c_str();
+    return true;
+  }
+
 };
 
 }

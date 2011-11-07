@@ -1,11 +1,10 @@
 #ifndef __PARAMETERIZED_COMPONENT_H_INCLUDED__
 #define __PARAMETERIZED_COMPONENT_H_INCLUDED__
 
-#include <smart_cfg_server/parameter_id_and_value.h>
+#include <map>
+
 #include <smart_cfg/controlled_component.h>
 #include <smart_cfg/parameter.h>
-
-#include <map>
 
 namespace smart_cfg
 {
@@ -14,15 +13,16 @@ class ParameterizedComponent : public virtual ControlledComponent
 {
 
 protected:
-  typedef std::map<ParameterID, AbstractParameter*> ParameterListType;
+  typedef std::map<std::string, AbstractParameter*> ParameterListType;
   ParameterListType parameter_list_;
 
   // Initialization/Construction methods used by the derived class.
+  ~ParameterizedComponent() {}
 
   void registerParameter( AbstractParameter * param )
   {
     // todo: check for already registered
-    parameter_list_[param->getId()] = param;
+    parameter_list_[param->name()] = param;
   }
 
   // Virtual Methods the derived class can override.
@@ -34,21 +34,18 @@ protected:
   {
   }
 
-  bool setParameterValue( const std::string& paramName, const std::string& valueType, const std::string& encodedValue )
+  bool setParameterValue( const std::string& param_name, const std::string& value_type, const std::string& encoded_value )
   {
-    ParameterID param_id( paramName );
-
-    ParameterListType::iterator elem = parameter_list_.find(param_id);
+    ParameterListType::iterator elem = parameter_list_.find(param_name);
 
     if( elem != parameter_list_.end() )
     {
-      ParameterValue param_value;
-      param_value.setFromEncodedValue( encodedValue, valueType );
-      (elem->second)->changeValue(param_value);
+      (elem->second)->setEncodedValue(value_type, encoded_value);
       return true;
     }
     else
     {
+      assert(false);
       return false;
     }
   }

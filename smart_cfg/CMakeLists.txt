@@ -11,6 +11,8 @@ include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
 
 rosbuild_init()
 
+find_package(yaml-cpp 0)
+
 #set the default path for built executables to the "bin" directory
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 #set the default path for built libraries to the "lib" directory
@@ -31,3 +33,6 @@ rosbuild_gensrv()
 
 rosbuild_add_library(${PROJECT_NAME} src/parameter.cpp)
 rosbuild_add_library(${PROJECT_NAME} src/abstract_parameter.cpp)
+
+
+target_link_libraries (${PROJECT_NAME} ${yaml-cpp_LIBRARIES})

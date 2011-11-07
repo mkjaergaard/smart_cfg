@@ -11,6 +11,8 @@ include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
 
 rosbuild_init()
 
+find_package(yaml-cpp 0)
+
 #set the default path for built executables to the "bin" directory
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 #set the default path for built libraries to the "lib" directory
@@ -38,3 +40,5 @@ rosbuild_add_executable(smart_cfg_server src/parameter_types.cpp)
 
 rosbuild_add_library(smart_cfg_server_l src/parameter_value_impl.cpp)
 rosbuild_add_library(smart_cfg_server_l src/parameter_types.cpp)
+
+target_link_libraries (smart_cfg_server ${yaml-cpp_LIBRARIES})

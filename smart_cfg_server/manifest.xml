@@ -10,7 +10,6 @@
   <url>http://ros.org/wiki/smart_cfg_server</url>
   <depend package="rospy"/>
   <depend package="roscpp"/>
-  <depend package="yaml_cpp"/>
   <depend package="smart_cfg_msgs"/>
 
 <export>

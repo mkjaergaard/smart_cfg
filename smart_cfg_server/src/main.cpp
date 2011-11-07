@@ -15,14 +15,36 @@
 
 int main(int argc, char** argv)
 {
+#if 0
+	YAML::Emitter out;
+	out << 123.45;
+out << "text";
+
+	std::cout << "Here's the output YAML:\n" << out.c_str()<< std::endl;
+
+	std::stringstream fin(out.c_str());
+	YAML::Parser parser(fin);
+
+	YAML::Node doc;
+	while(parser.GetNextDocument(doc)) {
+		double value;
+		doc >> value;
+		parser.GetNextDocument(doc);
+		std::string value2;
+		doc >> value2;
+		std::cout << value << " X " << value2 << std::endl;
+	}
+
+	return 0;
+#endif
   // Setup Mngr: Deployed Components
   smart_cfg_server::DeployedComponentManager::Ptr mngr( new smart_cfg_server::DeployedComponentManager() );
-  mngr->registerDeployedComponent( DeployedComponentID("cfg_dummy") );
+//  mngr->registerDeployedComponent( DeployedComponentID("cfg_dummy") );
 
   // Register a parameter for testing
-  ParameterIDAndValue new_value( ParameterID("someint") );
-  new_value.value().setFromValue<int>(2, ParameterStatus::OVERRIDDEN );
-  mngr->pushReplyReceivedNotify( DeployedComponentID("test"), new_value );
+//  ParameterIDAndValue new_value( ParameterID("someint") );
+//  new_value.value().setFromValue<int>(2, ParameterStatus::OVERRIDDEN );
+//  mngr->pushReplyReceivedNotify( DeployedComponentID("test"), new_value );
 
   // Setup ROS interfaces
   ros::init(argc, argv, "cfg_server");
@@ -35,11 +57,11 @@ int main(int argc, char** argv)
   mngr->registerPushHandler( system_ros );
 
   // Set an override
-  ParameterIDAndValue::ListOf override_list;
-  ParameterIDAndValue override_param( ParameterID("blop") );
-  override_param.value().setFromValue<int>(4);
-  override_list.push_back(override_param);
-  mngr->parameterValueOverrideRequest( DeployedComponentID("test"), override_list);
+//  ParameterIDAndValue::ListOf override_list;
+//  ParameterIDAndValue override_param( ParameterID("blop") );
+//  override_param.value().setFromValue<int>(4);
+//  override_list.push_back(override_param);
+//  mngr->parameterValueOverrideRequest( DeployedComponentID("test"), override_list);
 
   // Queue a change of a parameter: cfg_dummy/somefloat
 /*    ParameterChangeRequest::Ptr req( new ParameterChangeRequest("cfg_dummy") );
@@ -57,7 +79,7 @@ int main(int argc, char** argv)
  */
 
 return 0;
-
+#if 0
     std::ifstream fin("/home/morten/repositories/prevas/implementation/ros/ros-pkg/dtu/smart_cfg_server/models/cfg_dummy.cm");
     YAML::Parser parser(fin);
 
@@ -77,6 +99,6 @@ return 0;
        smart_cfg_server::ComponentModel m;
        doc >> m;
     }
-
+#endif
     return 0;
 }
